@@ -62,10 +62,11 @@ const createProduct = asyncHandler(async (req, res) => {
     user: req.user._id,
     image: '/images/sample.jpg',
     brand: 'Sample brand',
-    category: 'Sample category',
+    category: 'Electronics',
     countInStock: 0,
     numReviews: 0,
-    description: 'Sample description',
+    description:
+      'Get a better handle on your games with this Logitech LIGHTSYNC gaming mouse. The six programmable buttons allow customization for a smooth. Color: White. playing experience // Blue // 16GB // 256Gb',
   });
 
   const createdProduct = await product.save();
