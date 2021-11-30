@@ -1,28 +1,44 @@
-import React, { useEffect } from 'react'
-import { Link } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux'
-import { Row, Col } from 'react-bootstrap'
-import Product from '../components/Product'
-import Message from '../components/Message'
-import Loader from '../components/Loader'
-import Paginate from '../components/Paginate'
-import ProductCarousel from '../components/ProductCarousel'
-import Meta from '../components/Meta'
-import { listProducts } from '../actions/productActions'
+import React, { useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { Row, Col, Form } from 'react-bootstrap';
+import Product from '../components/Product';
+import Message from '../components/Message';
+import Loader from '../components/Loader';
+import Paginate from '../components/Paginate';
+import ProductCarousel from '../components/ProductCarousel';
+import Meta from '../components/Meta';
+import { listProducts } from '../actions/productActions';
 
 const HomeScreen = ({ match }) => {
-  const keyword = match.params.keyword
+  const keyword = match.params.keyword;
 
-  const pageNumber = match.params.pageNumber || 1
+  const pageNumber = match.params.pageNumber || 1;
 
-  const dispatch = useDispatch()
+  const dispatch = useDispatch();
 
-  const productList = useSelector((state) => state.productList)
-  const { loading, error, products, page, pages } = productList
+  const productList = useSelector((state) => state.productList);
+  const { loading, error, products, page, pages } = productList;
+  const [currentProducts, setCurrentProducts] = React.useState([]);
 
   useEffect(() => {
-    dispatch(listProducts(keyword, pageNumber))
-  }, [dispatch, keyword, pageNumber])
+    setCurrentProducts(products);
+  }, [products]);
+
+  useEffect(() => {
+    dispatch(listProducts(keyword, pageNumber));
+  }, [dispatch, keyword, pageNumber]);
+
+  const handleFilter = (values) => {
+    if (values) {
+      const foundValues = products.filter((item) => item.category === values);
+      setCurrentProducts(foundValues);
+    }
+
+    if (!values) {
+      setCurrentProducts(products);
+    }
+  };
 
   return (
     <>
@@ -41,22 +57,33 @@ const HomeScreen = ({ match }) => {
         <Message variant='danger'>{error}</Message>
       ) : (
         <>
+          <Form.Control
+            as='select'
+            custom
+            onChange={(e) => {
+              handleFilter(e.target.value);
+            }}
+          >
+            <option value=''>All</option>
+            <option value='Electronics'>Electronics</option>
+            <option value='Card'>Card</option>
+            <option value='Phone'>Phone</option>
+            <option value='Laptop'>Laptop</option>
+            <option value='Chip'>Chip</option>
+          </Form.Control>
+
           <Row>
-            {products.map((product) => (
+            {currentProducts?.map((product) => (
               <Col key={product._id} sm={12} md={6} lg={4} xl={3}>
                 <Product product={product} />
               </Col>
             ))}
           </Row>
-          <Paginate
-            pages={pages}
-            page={page}
-            keyword={keyword ? keyword : ''}
-          />
+          <Paginate pages={pages} page={page} keyword={keyword ? keyword : ''} />
         </>
       )}
     </>
-  )
-}
+  );
+};
 
-export default HomeScreen
+export default HomeScreen;
